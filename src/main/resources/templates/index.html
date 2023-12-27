@@ -8,36 +8,16 @@
     <!-- Add content here -->
     <div>Welcome to your Spring Boot with Thymeleaf project!</div>
     <div>See <code>HELP.md</code> for instructions on how to get started.</div>
-    <div id="container" style="width:100%; height:400px;"></div>
+    <div id="container" class="w-full"></div>
+    <div id="graph-container" class="max-w-full mx-auto sm:max-w-4xl bg-white p-4 pt-5 pb-2 rounded-lg border-gray-200 shadow">
+        <div class="" id="magnitude-plot"></div>
+        <div class="" id="phase-plot"></div>
+    </div>
 </div>
+
 <th:block layout:fragment="script-content">
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            const chart = Highcharts.chart('container', {
-                chart: {
-                    type: 'bar'
-                },
-                title: {
-                    text: 'Fruit Consumption'
-                },
-                xAxis: {
-                    categories: ['Apples', 'Bananas', 'Oranges']
-                },
-                yAxis: {
-                    title: {
-                        text: 'Fruit eaten'
-                    }
-                },
-                series: [{
-                    name: 'Jane',
-                    data: [1, 0, 4]
-                }, {
-                    name: 'John',
-                    data: [5, 7, 3]
-                }]
-            });
-        });
-    </script>
+    <script type="text/javascript" th:src="@{/webjars/highcharts/code/highcharts.js}"></script>
+    <script type="module" th:src="@{/js/result-plot.js}"></script>
 </th:block>
 </body>
 </html>
