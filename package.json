@@ -3,7 +3,7 @@
   "devDependencies": {
     "@babel/cli": "^7.23.4",
     "autoprefixer": "^10.4.16",
-    "browser-sync": "^2.29.3",
+    "browser-sync": "^2.23.7",
     "cssnano": "^6.0.2",
     "daisyui": "^4.4.24",
     "mkdirp": "^3.0.1",
@@ -32,5 +32,8 @@
     "watch:js": "onchange \"src/main/resources/static/js/**/*.js\" -- npm run build:js",
     "watch:svg": "onchange \"src/main/resources/static/svg/**/*.svg\" -- npm run build:svg",
     "watch:serve": "browser-sync start --no-inject-changes --proxy localhost:8080 --files \"target/classes/templates\" \"target/classes/static\""
+  },
+  "dependencies": {
+    "highcharts": "^11.1.0"
   }
 }
