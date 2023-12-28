@@ -1,7 +1,17 @@
-import {transferFunctions} from './tf.js';
-
 let sources = [];
 let frequencyArray = null;
+
+// Find the first good frequency array.
+for (let transferFunctionsKey in transferFunctions) {
+    let transferFunction = transferFunctions[transferFunctionsKey];
+    frequencyArray = transferFunction.frequencyArray;
+    if (frequencyArray && frequencyArray.length > 0) {
+        break;
+    }
+}
+
+let target = createPairByType('TARGET', frequencyArray, transferFunctions);
+let sum = createPairByType('SUM', frequencyArray, transferFunctions);
 
 try {
     let i = 0;
@@ -31,26 +41,18 @@ function createPairs(x, y) {
     });
 }
 
-let sum;
-try {
-    if (!frequencyArray && transferFunctions.SUM.frequencyArray.length > 0) {
-        frequencyArray = transferFunctions.SUM.frequencyArray;
+function createPairByType(type, frequencyArray, transferFunctions) {
+    let result;
+    try {
+        if (!frequencyArray && transferFunctions[type].frequencyArray.length > 0) {
+            frequencyArray = transferFunctions[type].frequencyArray;
+        }
+        const yValues = transferFunctions[type].magnitudeArray;
+        result = createPairs(frequencyArray, yValues);
+    } catch (e) {
+        console.error(e.message);
     }
-    const sumYvalues = transferFunctions.SUM.magnitudeArray;
-    sum = createPairs(frequencyArray, sumYvalues);
-} catch (e) {
-    console.error(e.message);
-}
-let target;
-
-try {
-    if (!frequencyArray && transferFunctions.TARGET.frequencyArray.length > 0) {
-        frequencyArray = transferFunctions.TARGET.frequencyArray;
-    }
-    const targetYvalues = transferFunctions.TARGET.magnitudeArray;
-    target = createPairs(frequencyArray, targetYvalues);
-} catch (e) {
-    console.error(e.message);
+    return result;
 }
 
 let corridor60degStart, corridor60degEnd, xovrStart, xovrEnd, xovrCenter, targetBw;
@@ -184,85 +186,86 @@ if (typeof sources === 'undefined' || !Array.isArray(sources) || !sources.length
             }
         }
 
-        const magnitudePlot = Highcharts.chart('magnitude-plot', {
-            chart: {
-                type: 'line',
-                zoomType: 'x',
-                height: plotHeight,
-                alignTicks: false
-            },
-            title: {
-                text: ''
-            },
-            xAxis: {
-                type: 'logarithmic',
-                lineColor: '#969696',
-                tickColor: '#969696',
-                labels: {
-                    style: {
+        const magnitudePlot = Highcharts.chart('magnitude-plot',
+            {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    height: plotHeight,
+                    alignTicks: false
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    type: 'logarithmic',
+                    lineColor: '#969696',
+                    tickColor: '#969696',
+                    labels: {
+                        style: {
+                            color: '#969696',
+                        }
+                    },
+                    crosshair: true,
+                    plotLines: typeof xovrCenter !== 'undefined' ? [{
                         color: '#969696',
+                        dashStyle: 'ShortDot',
+                        width: 1,
+                        value: xovrCenter,
+                        label: {
+                            text: 'c',
+                            verticalAlign: 'bottom',
+                            rotation: 0,
+                            textAlign: 'right',
+                            y: -2
+                        }
+                    }] : [],
+                    events: {
+                        afterSetExtremes: syncExtremes
                     }
                 },
-                crosshair: true,
-                plotLines: typeof xovrCenter !== 'undefined' ? [{
-                    color: '#969696',
-                    dashStyle: 'ShortDot',
-                    width: 1,
-                    value: xovrCenter,
-                    label: {
-                        text: 'c',
-                        verticalAlign: 'bottom',
-                        rotation: 0,
-                        textAlign: 'right',
+                yAxis: [{
+                    min: -18,
+                    max: 6,
+                    // tickInterval: 6,
+                    title: {
+                        text: 'Magnitude', reserveSpace: false, style: {
+                            color: '#969696'
+                        }
+                    },
+                    crosshair: true,
+                    labels: {
+                        format: '{value}dB',
+                        align: 'right',
+                        x: 6,
+                        y: -2,
+                        style: {
+                            color: '#969696'
+                        }
+                    }
+                }, { // Secondary yAxis
+                    title: {
+                        text: 'Coherence',
+                        reserveSpace: false,
+                    },
+                    opposite: true,
+                    min: 0,
+                    max: 1,
+                    top: '0%',
+                    height: '50%',
+                    labels: {
+                        align: 'right',
+                        x: -6,
                         y: -2
-                    }
-                }] : [],
-                events: {
-                    afterSetExtremes: syncExtremes
-                }
-            },
-            yAxis: [{
-                min: -18,
-                max: 6,
-                // tickInterval: 6,
-                title: {
-                    text: 'Magnitude', reserveSpace: false, style: {
-                        color: '#969696'
-                    }
+                    },
+                    gridLineWidth: 0
+                }],
+                legend: {enabled: false},
+                tooltip: {
+                    enabled: false
                 },
-                crosshair: true,
-                labels: {
-                    format: '{value}dB',
-                    align: 'right',
-                    x: 6,
-                    y: -2,
-                    style: {
-                        color: '#969696'
-                    }
-                }
-            }, { // Secondary yAxis
-                title: {
-                    text: 'Coherence',
-                    reserveSpace: false,
-                },
-                opposite: true,
-                min: 0,
-                max: 1,
-                top: '0%',
-                height: '50%',
-                labels: {
-                    align: 'right',
-                    x: -6,
-                    y: -2
-                },
-                gridLineWidth: 0
-            }],
-            legend: {enabled: false},
-            tooltip: {
-                enabled: false
-            },
-            series: magnitudeSeriesData
-        });
+                series: magnitudeSeriesData
+            });
 
         const phasePlot = Highcharts.chart('phase-plot', {
             chart: {
@@ -335,9 +338,5 @@ if (typeof sources === 'undefined' || !Array.isArray(sources) || !sources.length
                 }
             });
         });
-
-        Highcharts.Pointer.prototype.reset = function () {
-            return undefined;
-        };
     });
 }
