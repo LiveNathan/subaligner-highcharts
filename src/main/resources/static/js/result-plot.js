@@ -57,16 +57,26 @@ function createPairByType(type, frequencyArray, transferFunctions) {
 
 let corridor60degStart, corridor60degEnd, xovrStart, xovrEnd, xovrCenter, targetBw;
 
-if (!transferFunctions || !transferFunctions.OTHER || !transferFunctions.OTHER[0] || !transferFunctions.OTHER[0].transferFunctionDetailsDTO) {
+if (!preAlignmentDetails) {
     console.error('Relevant data is missing.');
 } else {
     try {
-        corridor60degStart = transferFunctions.OTHER[0].transferFunctionDetailsDTO.corridor60degStart;
-        corridor60degEnd = transferFunctions.OTHER[0].transferFunctionDetailsDTO.corridor60degEnd;
-        xovrStart = transferFunctions.OTHER[0].transferFunctionDetailsDTO.xovrStart;
-        xovrEnd = transferFunctions.OTHER[0].transferFunctionDetailsDTO.xovrEnd;
-        xovrCenter = transferFunctions.OTHER[0].transferFunctionDetailsDTO.xovrCenter;
-        targetBw = parseFloat(transferFunctions.OTHER[0].transferFunctionDetailsDTO.bandwidth.toFixed(1));
+        let corridor60degStartIndex = preAlignmentDetails.corridor60degStart;
+        corridor60degStart = frequencyArray[corridor60degStartIndex];
+
+        let corridor60degEndIndex = preAlignmentDetails.corridor60degEnd;
+        corridor60degEnd = frequencyArray[corridor60degEndIndex];
+
+        let xovrStartIndex = preAlignmentDetails.xovrStart;
+        xovrStart = frequencyArray[xovrStartIndex];
+
+        let xovrEndIndex = preAlignmentDetails.xovrEnd;
+        xovrEnd = frequencyArray[xovrEndIndex];
+
+        let xovrCenterIndex = preAlignmentDetails.xovrCenter;
+        xovrCenter = frequencyArray[xovrCenterIndex];
+
+        targetBw = parseFloat(preAlignmentDetails.bandwidth.toFixed(1));
     } catch (e) {
         console.error(e.message);
     }

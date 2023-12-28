@@ -17,6 +17,8 @@
 
 <th:block layout:fragment="script-content">
     <script type="text/javascript" th:src="@{/webjars/highcharts/code/highcharts.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/highcharts/code/modules/series-label.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/highcharts/code/modules/accessibility.js}"></script>
     <script th:inline="javascript">
         const transferFunctions = {
             "TARGET":
